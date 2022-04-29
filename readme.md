@@ -23,3 +23,9 @@ Un premier point en survellant le code.
 - Il y a beaucoup de nombres et de chaînes de caractère magiques.
 
 ## Stratégie
+
+Commencer par ce qui aura le moins d'effet de bord.
+
+1. Supprimer les doublons.
+2. Renommer.
+3. Atomiser les fonctions trop longues.
