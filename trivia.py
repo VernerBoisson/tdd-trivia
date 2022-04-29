@@ -50,24 +50,23 @@ class Game:
                 self.places[self.current_player] = self.places[self.current_player] + roll
                 if self.places[self.current_player] > 11:
                     self.places[self.current_player] = self.places[self.current_player] - 12
-
-                print(self.players[self.current_player] + \
-                            '\'s new location is ' + \
-                            str(self.places[self.current_player]))
-                print("The category is %s" % self._current_category)
-                self._ask_question()
+            self._log_question()
+            self._ask_question()
             
             print("%s is not getting out of the penalty box" % self.players[self.current_player])
             self.is_getting_out_of_penalty_box = False
         self.places[self.current_player] = self.places[self.current_player] + roll
         if self.places[self.current_player] > 11:
             self.places[self.current_player] = self.places[self.current_player] - 12
-
+        self._log_question()
+        self._ask_question()
+        
+    def _log_question(self):
         print(self.players[self.current_player] + \
                     '\'s new location is ' + \
                     str(self.places[self.current_player]))
         print("The category is %s" % self._current_category)
-        self._ask_question()
+
 
     def _ask_question(self):
         if self._current_category == 'Pop': print(self.pop_questions.pop(0))
