@@ -1,11 +1,26 @@
 #!/usr/bin/env python3
 from random import randrange
+from string import Template
 
 CONSTANT = {
     'NUMBER_OF_QUESTIONS': 50,
     'LIST_OF_CATEGORIES': ['Pop', 'Science', 'Sports', 'Rock'],
     'MIN_NUMBER_OF_PLAYERS': 2,
 }
+
+log_game = {
+    "add_player":"$player_name was added to the game.",
+    "number_of_players":'They are player number $number_of_player',
+}
+
+class Units:
+    @staticmethod
+    def is_odd(number):
+        return number % 2 != 0
+
+    @staticmethod
+    def print_log_game(log_key, **kwargs):
+        print(Template(log_game[log_key]).substitute(kwargs))
 
 class Game:
     def __init__(self):
@@ -36,8 +51,7 @@ class Game:
     def add_player(self, player_name):
         player = Player(player_name)
         self.players.add_player(player)
-        print(player_name + " was added")
-        print("They are player number %s" % self.players.__len__())
+
 
     def roll(self, roll):
         print("%s is the current player" % self.players[self.current_player])
@@ -161,6 +175,8 @@ class Players:
 
     def add_player(self, player):
         self.players.append(player)
+        Units.print_log_game('add_player', player_name=player.name)
+        Units.print_log_game('number_of_players', number_of_player=self.__len__())
 
     def __len__(self):
         return len(self.players)
