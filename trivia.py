@@ -1,43 +1,39 @@
 #!/usr/bin/env python3
 from random import randrange
 
+CONSTANT = {
+    'NUMBER_OF_QUESTIONS': 50,
+    'LIST_OF_CATEGORIES': ['Pop', 'Science', 'Sports', 'Rock'],
+    'MIN_NUMBER_OF_PLAYERS': 2,
+}
+
 class Game:
     def __init__(self):
-        self.players = []
-        self.places = [0] * 6
-        self.purses = [0] * 6
-        self.in_penalty_box = [0] * 6
-
-        self.pop_questions = []
-        self.science_questions = []
-        self.sports_questions = []
-        self.rock_questions = []
-
+        self.players = Players()
         self.current_player = 0
-        self.is_getting_out_of_penalty_box = False
+        self.list_all_questions = {}
+        self._init_list_categories(CONSTANT['LIST_OF_CATEGORIES'])
 
-        for i in range(50):
-            self.pop_questions.append("Pop Question %s" % i)
-            self.science_questions.append("Science Question %s" % i)
-            self.sports_questions.append("Sports Question %s" % i)
-            self.rock_questions.append("Rock Question %s" % i)
+    def _init_list_categories(self, list_of_categories):
+        for category in list_of_categories:
+            self.list_all_questions[category] = []
 
+    def _generate_questions(self):
+        for category in self.list_all_questions:
+            self.generate_questions(category, CONSTANT['NUMBER_OF_QUESTIONS'])
+
+    def _generate_questions_by_category(self, category_name, number_of_questions):
+        for question in range(number_of_questions):
+            self.list_all_questions[category_name].append(Question(f'{question.category_name} Question {question.__len__()}'))
 
     def is_playable(self):
-        return self.how_many_players >= 2
+        return self.players.__len__() >= CONSTANT['MIN_NUMBER_OF_PLAYERS']
 
     def add_player(self, player_name):
-        self.players.append(player_name)
-        self.places[self.how_many_players] = 0
-        self.purses[self.how_many_players] = 0
-        self.in_penalty_box[self.how_many_players] = False
-
+        player = Player(player_name)
+        self.players.add_player(player)
         print(player_name + " was added")
-        print("They are player number %s" % len(self.players))
-
-    @property
-    def how_many_players(self):
-        return len(self.players)
+        print("They are player number %s" % self.players.__len__())
 
     def _is_odd(self, n):
         return n % 2 != 0
@@ -47,7 +43,7 @@ class Game:
         print("They have rolled a %s" % roll)
 
         if self.in_penalty_box[self.current_player]:
-            if roll % 2 != 0:
+            if self._is_odd(roll):
                 self.is_getting_out_of_penalty_box = True
 
                 print("%s is getting out of the penalty box" % self.players[self.current_player])
@@ -106,11 +102,11 @@ class Game:
 
                 winner = self._did_player_win()
                 self.current_player += 1
-                if self.current_player == len(self.players): self.current_player = 0
+                if self.current_player == self.players.__len__(): self.current_player = 0
                 return winner
 
             self.current_player += 1
-            if self.current_player == len(self.players): self.current_player = 0
+            if self.current_player == self.players.__len__(): self.current_player = 0
             return True
         print("Answer was corrent!!!!")
         self.purses[self.current_player] += 1
@@ -121,7 +117,7 @@ class Game:
 
         winner = self._did_player_win()
         self.current_player += 1
-        if self.current_player == len(self.players): self.current_player = 0
+        if self.current_player == self.players.__len__(): self.current_player = 0
 
         return winner
 
@@ -131,12 +127,42 @@ class Game:
         self.in_penalty_box[self.current_player] = True
 
         self.current_player += 1
-        if self.current_player == len(self.players): self.current_player = 0
+        if self.current_player == self.players.__len__(): self.current_player = 0
 
     def _did_player_win(self):
         return not (self.purses[self.current_player] == 6)
 
+class Question:
+    def __init__(self, question):
+        self.question = question
+    
+class Questions:
+    def __init__(self, category_name):
+        self.category_name = category_name
+        self.questions = []
+    
+    def add_question(self, question):
+        self.questions.append(question)
 
+    def __len__(self):
+        return len(self.questions)
+
+class Player:
+    def __init__(self, name):
+        self.name = name
+        self.purse = 0
+        self.place = 0
+        self.in_penalty_box = False
+
+class Players:
+    def __init__(self):
+        self.players = []
+
+    def add_player(self, player):
+        self.players.append(player)
+
+    def __len__(self):
+        return len(self.players)
 
 if __name__ == '__main__':
     not_a_winner = False
