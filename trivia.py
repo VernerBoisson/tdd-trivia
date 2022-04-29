@@ -11,32 +11,33 @@ class Game:
     def __init__(self):
         self.players = Players()
         self.current_player = 0
-        self.list_all_questions = {}
+        self.list_all_questions = []
         self._init_list_categories(CONSTANT['LIST_OF_CATEGORIES'])
+        self._generate_questions_by_category()
 
     def _init_list_categories(self, list_of_categories):
         for category in list_of_categories:
-            self.list_all_questions[category] = []
+            self.list_all_questions.append(Questions(category))
 
-    def _generate_questions(self):
+    def _generate_questions_by_category(self):
         for category in self.list_all_questions:
-            self.generate_questions(category, CONSTANT['NUMBER_OF_QUESTIONS'])
+            self._generate_questions(category)
 
-    def _generate_questions_by_category(self, category_name, number_of_questions):
-        for question in range(number_of_questions):
-            self.list_all_questions[category_name].append(Question(f'{question.category_name} Question {question.__len__()}'))
+    def _generate_questions(self, category):
+        for _ in range(CONSTANT['NUMBER_OF_QUESTIONS']):
+            category.add_question(Question(f'{category.category_name} Question {category.__len__()}'))
 
-    def is_playable(self):
+    def _is_playable(self):
         return self.players.__len__() >= CONSTANT['MIN_NUMBER_OF_PLAYERS']
+
+    def _is_odd(self, n):
+        return n % 2 != 0
 
     def add_player(self, player_name):
         player = Player(player_name)
         self.players.add_player(player)
         print(player_name + " was added")
         print("They are player number %s" % self.players.__len__())
-
-    def _is_odd(self, n):
-        return n % 2 != 0
 
     def roll(self, roll):
         print("%s is the current player" % self.players[self.current_player])
@@ -173,12 +174,12 @@ if __name__ == '__main__':
     game.add_player('Pat')
     game.add_player('Sue')
 
-    while True:
-        game.roll(randrange(5) + 1)
+    # while True:
+    #     game.roll(randrange(5) + 1)
 
-        if randrange(9) == 7:
-            not_a_winner = game.wrong_answer()
-        else:
-            not_a_winner = game.was_correctly_answered()
+    #     if randrange(9) == 7:
+    #         not_a_winner = game.wrong_answer()
+    #     else:
+    #         not_a_winner = game.was_correctly_answered()
 
-        if not not_a_winner: break
+    #     if not not_a_winner: break
