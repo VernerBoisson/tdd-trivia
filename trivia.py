@@ -25,7 +25,7 @@ class Game:
     def is_playable(self):
         return self.how_many_players >= 2
 
-    def add(self, player_name):
+    def add_player(self, player_name):
         self.players.append(player_name)
         self.places[self.how_many_players] = 0
         self.purses[self.how_many_players] = 0
@@ -142,9 +142,9 @@ if __name__ == '__main__':
 
     game = Game()
 
-    game.add('Chet')
-    game.add('Pat')
-    game.add('Sue')
+    game.add_player('Chet')
+    game.add_player('Pat')
+    game.add_player('Sue')
 
     while True:
         game.roll(randrange(5) + 1)
