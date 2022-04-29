@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from random import randrange
 
 class Game:
     def __init__(self):
@@ -38,12 +39,15 @@ class Game:
     def how_many_players(self):
         return len(self.players)
 
+    def _is_odd(self, n):
+        return n % 2 != 0
+
     def roll(self, roll):
         print("%s is the current player" % self.players[self.current_player])
         print("They have rolled a %s" % roll)
 
         if self.in_penalty_box[self.current_player]:
-            if roll % 2 != 0:
+            if self._is_odd(roll):
                 self.is_getting_out_of_penalty_box = True
 
                 print("%s is getting out of the penalty box" % self.players[self.current_player])
@@ -60,7 +64,7 @@ class Game:
             self.places[self.current_player] = self.places[self.current_player] - 12
         self._log_question()
         self._ask_question()
-        
+
     def _log_question(self):
         print(self.players[self.current_player] + \
                     '\'s new location is ' + \
@@ -124,7 +128,6 @@ class Game:
         return not (self.purses[self.current_player] == 6)
 
 
-from random import randrange
 
 if __name__ == '__main__':
     not_a_winner = False
