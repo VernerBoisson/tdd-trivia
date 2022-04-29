@@ -47,23 +47,32 @@ class Game:
         print("They have rolled a %s" % roll)
 
         if self.in_penalty_box[self.current_player]:
-            if self._is_odd(roll):
+            if roll % 2 != 0:
                 self.is_getting_out_of_penalty_box = True
 
                 print("%s is getting out of the penalty box" % self.players[self.current_player])
                 self.places[self.current_player] = self.places[self.current_player] + roll
                 if self.places[self.current_player] > 11:
                     self.places[self.current_player] = self.places[self.current_player] - 12
-            self._log_question()
+
+                print(self.players[self.current_player] + \
+                            '\'s new location is ' + \
+                            str(self.places[self.current_player]))
+                print("The category is %s" % self._current_category)
+                self._ask_question()
+            else:
+                print("%s is not getting out of the penalty box" % self.players[self.current_player])
+                self.is_getting_out_of_penalty_box = False
+        else:
+            self.places[self.current_player] = self.places[self.current_player] + roll
+            if self.places[self.current_player] > 11:
+                self.places[self.current_player] = self.places[self.current_player] - 12
+
+            print(self.players[self.current_player] + \
+                        '\'s new location is ' + \
+                        str(self.places[self.current_player]))
+            print("The category is %s" % self._current_category)
             self._ask_question()
-            
-            print("%s is not getting out of the penalty box" % self.players[self.current_player])
-            self.is_getting_out_of_penalty_box = False
-        self.places[self.current_player] = self.places[self.current_player] + roll
-        if self.places[self.current_player] > 11:
-            self.places[self.current_player] = self.places[self.current_player] - 12
-        self._log_question()
-        self._ask_question()
 
     def _log_question(self):
         print(self.players[self.current_player] + \
