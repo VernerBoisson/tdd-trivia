@@ -84,24 +84,24 @@ class Game:
         return self.players.get_player_by_index(self.current_player)
 
     def _get_current_player_name(self):
-        return self._get_current_player_name
+        return self.get_current_player().name
 
     def _leave_penalty_box(self, roll_dice):
         if Utils.is_even(roll_dice):
             Utils.print_log_game('not_leave_penalty_box', roll_result=roll_dice)
             return
-        Utils.print_log_game('leave_penality_box', player_name=self._get_current_player_name)
+        Utils.print_log_game('leave_penality_box', player_name=self._get_current_player_name())
         self.get_current_player().is_in_penalty_box = False
 
     def _move_player_place(self, roll_dice):
         self.get_current_player().place += roll_dice
         if self.get_current_player().place > 11:
             self.get_current_player().place -= 12      
-        Utils.print_log_game('new_location', player_name=self._get_current_player_name,\
+        Utils.print_log_game('new_location', player_name=self._get_current_player_name(),\
             new_location=self.get_current_player().place)
 
     def player_turn(self, roll_dice):
-        Utils.print_log_game('player_turn', player_name=self._get_current_player_name)
+        Utils.print_log_game('player_turn', player_name=self._get_current_player_name())
         Utils.print_log_game('roll_result', roll_result=roll_dice)
 
         if self.get_current_player().is_in_penalty_box:
@@ -152,7 +152,7 @@ class Game:
 
     def wrong_answer(self):
         Utils.print_log_game('wrong_answer')
-        Utils.print_log_game('sent_to_penalty_box', player_name=self._get_current_player_name)
+        Utils.print_log_game('sent_to_penalty_box', player_name=self._get_current_player_name())
         self.get_current_player().is_in_penalty_box = True
 
     def _change_current_player(self):
