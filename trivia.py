@@ -17,6 +17,14 @@ log_game = {
     'leave_penalty_box': '$player_name is getting out of the penalty box',
     'not_leave_penalty_box': '$player_name is not getting out of the penalty box',
     'new_location': '$player_name\'s new location is $new_location',
+    'question_category': 'The category is $question_category',
+}
+
+dict_places_category = {
+    (0,4,8): 'Pop',
+    (1,5,9): 'Science',
+    (2,6,10): 'Sports',
+    (3,7,11): 'Rock',
 }
 
 class Utils:
@@ -32,6 +40,13 @@ class Utils:
     @staticmethod
     def print_log_game(log_key, **kwargs):
         print(Utils.template_log(log_key, **kwargs))
+
+    @staticmethod
+    def multi_key_dict_get(dict, key):
+        for keys, value in dict.items():
+            if key in keys:
+                return value
+        return None
 
 class Game:
     def __init__(self):
@@ -91,18 +106,15 @@ class Game:
             self._ask_question()
 
     def _ask_question(self):
-        print("The category is %s" % self._current_category)
-        if self._current_category == 'Pop': print(self.pop_questions.pop(0))
-        if self._current_category == 'Science': print(self.science_questions.pop(0))
-        if self._current_category == 'Sports': print(self.sports_questions.pop(0))
-        if self._current_category == 'Rock': print(self.rock_questions.pop(0))
+        Utils.print_log_game('question_category', question_category=self._current_category())
+        print(self.list_all_questions[0].questions[0].question)
+        # if self._current_category == 'Pop': print(1, self.list_all_questions[0].questions.pop(0))
+        # if self._current_category == 'Science': print(2, self.list_all_questions[1].questions.pop(0))
+        # if self._current_category == 'Sports': print(3, self.list_all_questions[2].questions.pop(0))
+        # if self._current_category == 'Rock': print(4, self.list_all_questions[3].questions.pop(0))
 
-    @property
     def _current_category(self):
-        if self.places[self.current_player] in [0,4,8]: return 'Pop'
-        if self.places[self.current_player] in [1,5,9]: return 'Science'
-        if self.places[self.current_player] in [2,6,10]: return 'Sports'
-        return 'Rock'
+        return Utils.multi_key_dict_get(dict_places_category, self.get_current_player().place)
 
     def was_correctly_answered(self):
         if self.in_penalty_box[self.current_player]:
