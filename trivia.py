@@ -81,29 +81,29 @@ class Game:
     def get_current_player(self):
         return self.players.get_player_by_index(self.current_player)
 
-    def _leave_penalty_box(self, roll):
-        if Utils.is_even(roll):
-            Utils.print_log_game('not_leave_penalty_box', roll_result=roll)
+    def _leave_penalty_box(self, roll_dice):
+        if Utils.is_even(roll_dice):
+            Utils.print_log_game('not_leave_penalty_box', roll_result=roll_dice)
             return
         Utils.print_log_game('leave_penality_box', player_name=self.get_current_player().name)
         self.get_current_player().is_in_penalty_box = False
 
-    def _move_player_place(self, roll):
-        self.get_current_player().place += roll
+    def _move_player_place(self, roll_dice):
+        self.get_current_player().place += roll_dice
         if self.get_current_player().place > 11:
             self.get_current_player().place -= 12      
         Utils.print_log_game('new_location', player_name=self.get_current_player().name,\
             new_location=self.get_current_player().place)
 
-    def roll(self, roll):
+    def player_turn(self, roll_dice):
         Utils.print_log_game('player_turn', player_name=self.get_current_player().name)
-        Utils.print_log_game('roll_result', roll_result=roll)
+        Utils.print_log_game('roll_result', roll_result=roll_dice)
 
         if self.get_current_player().is_in_penalty_box:
-            self._leave_penalty_box(roll)
+            self._leave_penalty_box(roll_dice)
         
         if not self.get_current_player().is_in_penalty_box:
-            self._move_player_place(roll)
+            self._move_player_place(roll_dice)
             self._ask_question()
 
     def _ask_question(self):
@@ -203,12 +203,13 @@ if __name__ == '__main__':
     game.add_player('Sue')
     counter = 0
     while True:
-        game.roll(randrange(5) + 1)
+        game.player_turn(randrange(5) + 1)
         
         if randrange(9) == 7:
-            not_a_winner = game.wrong_answer()
+            # not_a_winner = game.wrong_answer()
+            not_a_winner = False
         else:
-           not_a_winner = game.was_correctly_answered()
-
+            # not_a_winner = game.was_correctly_answered()
+            not_a_winner = True
         if not not_a_winner: break
     
