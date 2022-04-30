@@ -10,21 +10,23 @@ CONSTANT = {
 
 log_game = {
     'add_player':'$player_name was added to the game.',
+    'add_question': '$question_category Question $question_number',
     'number_of_players':'They are player number $number_of_player',
     'player_turn':'$player_name is the current player',
+    'new_location': '$player_name\'s new location is $new_location',
     'roll_result': 'They have rolled a $roll_result',
-    'add_question': '$question_category Question $question_number',
+    'sent_to_penalty_box': '$player_name was sent to the penalty box',
     'leave_penalty_box': '$player_name is getting out of the penalty box',
     'not_leave_penalty_box': '$player_name is not getting out of the penalty box',
-    'new_location': '$player_name\'s new location is $new_location',
     'question_category': 'The category is $question_category',
+    'wrong_answer': 'Question was incorrectly answered',
 }
 
 dict_places_category = {
-    (0,4,8): 'Pop',
-    (1,5,9): 'Science',
-    (2,6,10): 'Sports',
-    (3,7,11): 'Rock',
+    (0,4,8): CONSTANT['LIST_OF_CATEGORIES'][0],
+    (1,5,9): CONSTANT['LIST_OF_CATEGORIES'][1],
+    (2,6,10): CONSTANT['LIST_OF_CATEGORIES'][2],
+    (3,7,11): CONSTANT['LIST_OF_CATEGORIES'][3],
 }
 
 class Utils:
@@ -81,22 +83,25 @@ class Game:
     def get_current_player(self):
         return self.players.get_player_by_index(self.current_player)
 
+    def _get_current_player_name(self):
+        return self._get_current_player_name
+
     def _leave_penalty_box(self, roll_dice):
         if Utils.is_even(roll_dice):
             Utils.print_log_game('not_leave_penalty_box', roll_result=roll_dice)
             return
-        Utils.print_log_game('leave_penality_box', player_name=self.get_current_player().name)
+        Utils.print_log_game('leave_penality_box', player_name=self._get_current_player_name)
         self.get_current_player().is_in_penalty_box = False
 
     def _move_player_place(self, roll_dice):
         self.get_current_player().place += roll_dice
         if self.get_current_player().place > 11:
             self.get_current_player().place -= 12      
-        Utils.print_log_game('new_location', player_name=self.get_current_player().name,\
+        Utils.print_log_game('new_location', player_name=self._get_current_player_name,\
             new_location=self.get_current_player().place)
 
     def player_turn(self, roll_dice):
-        Utils.print_log_game('player_turn', player_name=self.get_current_player().name)
+        Utils.print_log_game('player_turn', player_name=self._get_current_player_name)
         Utils.print_log_game('roll_result', roll_result=roll_dice)
 
         if self.get_current_player().is_in_penalty_box:
@@ -105,6 +110,8 @@ class Game:
         if not self.get_current_player().is_in_penalty_box:
             self._move_player_place(roll_dice)
             self._ask_question()
+        
+        self._change_current_player()
 
     def _ask_question(self):
         Utils.print_log_game('question_category', question_category=self._current_category())
@@ -140,18 +147,17 @@ class Game:
             ' Gold Coins.')
 
         winner = self._did_player_win()
-        self.current_player += 1
-        if self.current_player == self.players.__len__(): self.current_player = 0
 
         return winner
 
     def wrong_answer(self):
-        print('Question was incorrectly answered')
-        print(self.players[self.current_player] + " was sent to the penalty box")
-        self.in_penalty_box[self.current_player] = True
+        Utils.print_log_game('wrong_answer')
+        Utils.print_log_game('sent_to_penalty_box', player_name=self._get_current_player_name)
+        self.get_current_player().is_in_penalty_box = True
 
+    def _change_current_player(self):
         self.current_player += 1
-        if self.current_player == self.players.__len__(): self.current_player = 0
+        if self.current_player > self.players.__len__(): self.current_player = 0
 
     def _did_player_win(self):
         return not (self.purses[self.current_player] == 6)
