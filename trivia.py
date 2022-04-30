@@ -52,17 +52,17 @@ class Game:
     def __init__(self):
         self.players = Players()
         self.current_player = 0
-        self.list_all_questions = []
+        self.list_all_questions = {}
         self._init_list_categories(CONSTANT['LIST_OF_CATEGORIES'])
         self._generate_questions_by_category()
 
     def _init_list_categories(self, list_of_categories):
         for category in list_of_categories:
-            self.list_all_questions.append(Questions(category))
+            self.list_all_questions[category] = Questions(category)
 
     def _generate_questions_by_category(self):
-        for category in self.list_all_questions:
-            self._generate_questions(category)
+        for list_questions in self.list_all_questions.values():
+            self._generate_questions(list_questions)
 
     def _generate_questions(self, category):
         for _ in range(CONSTANT['NUMBER_OF_QUESTIONS']):
@@ -86,6 +86,7 @@ class Game:
             Utils.print_log_game('not_leave_penalty_box', roll_result=roll)
             return
         Utils.print_log_game('leave_penality_box', player_name=self.get_current_player().name)
+        self.get_current_player().is_in_penalty_box = False
 
     def _move_player_place(self, roll):
         self.get_current_player().place += roll
@@ -98,20 +99,17 @@ class Game:
         Utils.print_log_game('player_turn', player_name=self.get_current_player().name)
         Utils.print_log_game('roll_result', roll_result=roll)
 
-        if self.get_current_player().in_penalty_box:
+        if self.get_current_player().is_in_penalty_box:
             self._leave_penalty_box(roll)
         
-        if not self.get_current_player().in_penalty_box:
+        if not self.get_current_player().is_in_penalty_box:
             self._move_player_place(roll)
             self._ask_question()
 
     def _ask_question(self):
         Utils.print_log_game('question_category', question_category=self._current_category())
-        print(self.list_all_questions[0].questions[0].question)
-        # if self._current_category == 'Pop': print(1, self.list_all_questions[0].questions.pop(0))
-        # if self._current_category == 'Science': print(2, self.list_all_questions[1].questions.pop(0))
-        # if self._current_category == 'Sports': print(3, self.list_all_questions[2].questions.pop(0))
-        # if self._current_category == 'Rock': print(4, self.list_all_questions[3].questions.pop(0))
+        print(self.list_all_questions[self._current_category()].questions[-1].question)
+        self.list_all_questions[self._current_category()].questions.pop()
 
     def _current_category(self):
         return Utils.multi_key_dict_get(dict_places_category, self.get_current_player().place)
@@ -178,7 +176,7 @@ class Player:
         self.name = name
         self.purse = 0
         self.place = 0
-        self.in_penalty_box = False
+        self.is_in_penalty_box = False
 
 class Players:
     def __init__(self):
@@ -203,14 +201,14 @@ if __name__ == '__main__':
     game.add_player('Chet')
     game.add_player('Pat')
     game.add_player('Sue')
-
+    counter = 0
     while True:
         game.roll(randrange(5) + 1)
+        
+        if randrange(9) == 7:
+            not_a_winner = game.wrong_answer()
+        else:
+           not_a_winner = game.was_correctly_answered()
 
-        # if randrange(9) == 7:
-        #     not_a_winner = game.wrong_answer()
-        # else:
-        #     not_a_winner = game.was_correctly_answered()
-
-        # if not not_a_winner: break
-        break
+        if not not_a_winner: break
+    
