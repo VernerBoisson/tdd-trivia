@@ -13,16 +13,25 @@ log_game = {
     'number_of_players':'They are player number $number_of_player',
     'player_turn':'$player_name is the current player',
     'roll_result': 'They have rolled a $roll_result',
+    'add_question': '$question_category Question $question_number',
+    'leave_penalty_box': '$player_name is getting out of the penalty box',
+    'not_leave_penalty_box': '$player_name is not getting out of the penalty box',
+    'new_location': '$player_name\'s new location is $new_location',
 }
 
 class Utils:
     @staticmethod
-    def is_odd(number):
-        return number % 2 != 0
+    def is_even(number):
+        return number % 2 == 0
+
+    @staticmethod
+    def template_log(log_type, **kwargs):
+        return Template(log_game[log_type]).substitute(kwargs)
+
 
     @staticmethod
     def print_log_game(log_key, **kwargs):
-        print(Template(log_game[log_key]).substitute(kwargs))
+        print(Utils.template_log(log_key, **kwargs))
 
 class Game:
     def __init__(self):
@@ -42,7 +51,10 @@ class Game:
 
     def _generate_questions(self, category):
         for _ in range(CONSTANT['NUMBER_OF_QUESTIONS']):
-            category.add_question(Question(f'{category.category_name} Question {category.__len__()}'))
+            category.add_question(Question(\
+                Utils.template_log('add_question',\
+                     question_category=category.category_name,\
+                     question_number=category.questions.__len__())))
 
     def _is_playable(self):
         return self.players.__len__() >= CONSTANT['MIN_NUMBER_OF_PLAYERS']
@@ -54,49 +66,32 @@ class Game:
     def get_current_player(self):
         return self.players.get_player_by_index(self.current_player)
 
+    def _leave_penalty_box(self, roll):
+        if Utils.is_even(roll):
+            Utils.print_log_game('not_leave_penalty_box', roll_result=roll)
+            return
+        Utils.print_log_game('leave_penality_box', player_name=self.get_current_player().name)
+
+    def _move_player_place(self, roll):
+        self.get_current_player().place += roll
+        if self.get_current_player().place > 11:
+            self.get_current_player().place -= 12      
+        Utils.print_log_game('new_location', player_name=self.get_current_player().name,\
+            new_location=self.get_current_player().place)
 
     def roll(self, roll):
         Utils.print_log_game('player_turn', player_name=self.get_current_player().name)
         Utils.print_log_game('roll_result', roll_result=roll)
 
-        if self.in_penalty_box[self.current_player]:
-            print('if')
-            # if Utils.is_odd(roll):
-            #     self.is_getting_out_of_penalty_box = True
-
-            #     print("%s is getting out of the penalty box" % self.players[self.current_player])
-            #     self.places[self.current_player] = self.places[self.current_player] + roll
-            #     if self.places[self.current_player] > 11:
-            #         self.places[self.current_player] = self.places[self.current_player] - 12
-
-            #     print(self.players[self.current_player] + \
-            #                 '\'s new location is ' + \
-            #                 str(self.places[self.current_player]))
-            #     print("The category is %s" % self._current_category)
-            #     self._ask_question()
-            # else:
-            #     print("%s is not getting out of the penalty box" % self.players[self.current_player])
-            #     self.is_getting_out_of_penalty_box = False
-        else:
-            print('else')
-            # self.places[self.current_player] = self.places[self.current_player] + roll
-            # if self.places[self.current_player] > 11:
-            #     self.places[self.current_player] = self.places[self.current_player] - 12
-
-            # print(self.players[self.current_player] + \
-            #             '\'s new location is ' + \
-            #             str(self.places[self.current_player]))
-            # print("The category is %s" % self._current_category)
-            # self._ask_question()
-
-    def _log_question(self):
-        print(self.players[self.current_player] + \
-                    '\'s new location is ' + \
-                    str(self.places[self.current_player]))
-        print("The category is %s" % self._current_category)
-
+        if self.get_current_player().in_penalty_box:
+            self._leave_penalty_box(roll)
+        
+        if not self.get_current_player().in_penalty_box:
+            self._move_player_place(roll)
+            self._ask_question()
 
     def _ask_question(self):
+        print("The category is %s" % self._current_category)
         if self._current_category == 'Pop': print(self.pop_questions.pop(0))
         if self._current_category == 'Science': print(self.science_questions.pop(0))
         if self._current_category == 'Sports': print(self.sports_questions.pop(0))
@@ -200,9 +195,10 @@ if __name__ == '__main__':
     while True:
         game.roll(randrange(5) + 1)
 
-        if randrange(9) == 7:
-            not_a_winner = game.wrong_answer()
-        else:
-            not_a_winner = game.was_correctly_answered()
+        # if randrange(9) == 7:
+        #     not_a_winner = game.wrong_answer()
+        # else:
+        #     not_a_winner = game.was_correctly_answered()
 
-        if not not_a_winner: break
+        # if not not_a_winner: break
+        break
