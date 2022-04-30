@@ -133,11 +133,11 @@ class Game:
 
                 winner = self._did_player_win()
                 self.current_player += 1
-                if self.current_player == self.players.__len__(): self.current_player = 0
+                if self.current_player == self.players._last_index(): self.current_player = 0
                 return winner
 
             self.current_player += 1
-            if self.current_player == self.players.__len__(): self.current_player = 0
+            if self.current_player == self.players._last_index(): self.current_player = 0
             return True
         print("Answer was corrent!!!!")
         self.purses[self.current_player] += 1
@@ -157,7 +157,7 @@ class Game:
 
     def _change_current_player(self):
         self.current_player += 1
-        if self.current_player > self.players.__len__(): self.current_player = 0
+        if self.current_player > self.players._last_index(): self.current_player = 0
 
     def _did_player_win(self):
         return not (self.purses[self.current_player] == 6)
@@ -198,6 +198,9 @@ class Players:
 
     def __len__(self):
         return len(self.players)
+
+    def _last_index(self):
+        return self.players.__len__() - 1
 
 if __name__ == '__main__':
     not_a_winner = False
