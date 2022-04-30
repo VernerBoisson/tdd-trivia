@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from random import randint
-from string import Template
+from utils import Utils
 
 CONSTANT = {
     'NUMBER_OF_QUESTIONS_BY_CATEGORY': 50,
@@ -11,22 +11,6 @@ CONSTANT = {
     'NUMBER_OF_PLACES': 12,
 }
 
-log_game = {
-    'add_player':'$player_name was added to the game.',
-    'add_question': '$question_category Question $question_number',
-    'number_of_players':'They are player number $number_of_player',
-    'player_turn':'$player_name is the current player',
-    'new_location': '$player_name\'s new location is $new_location',
-    'roll_result': 'They have rolled a $roll_result',
-    'sent_to_penalty_box': '$player_name was sent to the penalty box',
-    'leave_penalty_box': '$player_name is getting out of the penalty box',
-    'not_leave_penalty_box': '$player_name is not getting out of the penalty box',
-    'question_category': 'The category is $question_category',
-    'wrong_answer': 'Question was incorrectly answered',
-    'correct_answer': 'Answer was correct!!!!',
-    'player_score': '$player_name now has $player_score Gold Coins.',
-    'winner': '$player_name won the game with $player_score Gold Coins!',
-}
 
 dict_places_category = {
     (0,4,8): CONSTANT['LIST_OF_CATEGORIES'][0],
@@ -34,27 +18,6 @@ dict_places_category = {
     (2,6,10): CONSTANT['LIST_OF_CATEGORIES'][2],
     (3,7,11): CONSTANT['LIST_OF_CATEGORIES'][3],
 }
-
-class Utils:
-    @staticmethod
-    def is_even(number):
-        return number % 2 == 0
-
-    @staticmethod
-    def template_log(log_type, **kwargs):
-        return Template(log_game[log_type]).substitute(kwargs)
-
-
-    @staticmethod
-    def print_log_game(log_key, **kwargs):
-        print(Utils.template_log(log_key, **kwargs))
-
-    @staticmethod
-    def multi_key_dict_get(dict, key):
-        for keys, value in dict.items():
-            if key in keys:
-                return value
-        return None
 
 class Game:
     def __init__(self):

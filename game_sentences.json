@@ -1,0 +1,16 @@
+{
+    "add_player": "$player_name was added to the game.",
+    "add_question": "$question_category Question $question_number",
+    "number_of_players": "They are player number $number_of_player",
+    "player_turn": "$player_name is the current player",
+    "new_location": "$player_name\"s new location is $new_location",
+    "roll_result": "They have rolled a $roll_result",
+    "sent_to_penalty_box": "$player_name was sent to the penalty box",
+    "leave_penalty_box": "$player_name is getting out of the penalty box",
+    "not_leave_penalty_box": "$player_name is not getting out of the penalty box",
+    "question_category": "The category is $question_category",
+    "wrong_answer": "Question was incorrectly answered",
+    "correct_answer": "Answer was correct!!!!",
+    "player_score": "$player_name now has $player_score Gold Coins.",
+    "winner": "$player_name won the game with $player_score Gold Coins!"
+}
