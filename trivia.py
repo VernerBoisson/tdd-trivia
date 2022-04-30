@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from random import randrange
+from random import randint
 from string import Template
 
 CONSTANT = {
@@ -7,6 +7,7 @@ CONSTANT = {
     'LIST_OF_CATEGORIES': ['Pop', 'Science', 'Sports', 'Rock'],
     'MIN_NUMBER_OF_PLAYERS': 2,
     'POINT_FOR_WINNING': 6,
+    'DICE_FACE': 6,
 }
 
 log_game = {
@@ -79,40 +80,52 @@ class Game:
     def _is_playable(self):
         return self.players.__len__() >= CONSTANT['MIN_NUMBER_OF_PLAYERS']
 
+    def start(self):
+        while self._is_playable() and not self._is_current_player_winner():
+            self._player_turn(self._roll_dice())
+        
+
+    def _roll_dice(self):
+        return randint(1, CONSTANT['DICE_FACE'])
+
     def add_player(self, player_name):
         player = Player(player_name)
         self.players.add_player(player)
 
-    def get_current_player(self):
+    def add_players(self, list_players_name):
+        [self.add_player(player_name) for player_name in list_players_name]
+
+    def _get_current_player(self):
         return self.players.get_player_by_index(self.current_player)
 
     def _get_current_player_name(self):
-        return self.get_current_player().name
+        return self._get_current_player().name
 
     def _leave_penalty_box(self, roll_dice):
         if Utils.is_even(roll_dice):
-            Utils.print_log_game('not_leave_penalty_box', roll_result=roll_dice)
+            Utils.print_log_game('not_leave_penalty_box', player_name=self._get_current_player_name())
             return
-        Utils.print_log_game('leave_penality_box', player_name=self._get_current_player_name())
-        self.get_current_player().is_in_penalty_box = False
+        Utils.print_log_game('leave_penalty_box', player_name=self._get_current_player_name())
+        self._get_current_player().is_in_penalty_box = False
 
     def _move_player_place(self, roll_dice):
-        self.get_current_player().place += roll_dice
-        if self.get_current_player().place > 11:
-            self.get_current_player().place -= 12      
+        self._get_current_player().place += roll_dice
+        if self._get_current_player().place > 11:
+            self._get_current_player().place -= 12      
         Utils.print_log_game('new_location', player_name=self._get_current_player_name(),\
-            new_location=self.get_current_player().place)
+            new_location=self._get_current_player().place)
 
-    def player_turn(self, roll_dice):
+    def _player_turn(self, roll_dice):
         Utils.print_log_game('player_turn', player_name=self._get_current_player_name())
         Utils.print_log_game('roll_result', roll_result=roll_dice)
 
-        if self.get_current_player().is_in_penalty_box:
+        if self._get_current_player().is_in_penalty_box:
             self._leave_penalty_box(roll_dice)
         
-        if not self.get_current_player().is_in_penalty_box:
+        if not self._get_current_player().is_in_penalty_box:
             self._move_player_place(roll_dice)
             self._ask_question()
+            self._simulate_player_answer()
         
         self._change_current_player()
 
@@ -121,26 +134,32 @@ class Game:
         print(self.list_all_questions[self._current_category()].questions[-1].question)
         self.list_all_questions[self._current_category()].questions.pop()
 
-    def _current_category(self):
-        return Utils.multi_key_dict_get(dict_places_category, self.get_current_player().place)
+    def _simulate_player_answer(self):
+        if randint(0, 4) == 0:
+            self._correct_answer()
+            return
+        self._wrong_answer()
 
-    def was_correctly_answered(self):
-        self.get_current_player().score += 1
+    def _current_category(self):
+        return Utils.multi_key_dict_get(dict_places_category, self._get_current_player().place)
+
+    def _correct_answer(self):
+        self._get_current_player().score += 1
         Utils.print_log_game('correct_answer')
-        Utils.print_log_game('player_score', player_name=self._get_current_player_name(), player_score=self.get_current_player().score)
+        Utils.print_log_game('player_score', player_name=self._get_current_player_name(), player_score=self._get_current_player().score)
  
 
-    def wrong_answer(self):
+    def _wrong_answer(self):
         Utils.print_log_game('wrong_answer')
         Utils.print_log_game('sent_to_penalty_box', player_name=self._get_current_player_name())
-        self.get_current_player().is_in_penalty_box = True
+        self._get_current_player().is_in_penalty_box = True
 
     def _change_current_player(self):
         self.current_player += 1
         if self.current_player > self.players._last_index(): self.current_player = 0
 
-    def _did_player_win(self):
-        return self.get_current_player().score >= CONSTANT['POINT_FOR_WINNING']
+    def _is_current_player_winner(self):
+        return self._get_current_player().score >= CONSTANT['POINT_FOR_WINNING']
 
 class Question:
     def __init__(self, question):
@@ -183,20 +202,6 @@ class Players:
         return self.players.__len__() - 1
 
 if __name__ == '__main__':
-    not_a_winner = False
-
     game = Game()
-
-    game.add_player('Chet')
-    game.add_player('Pat')
-    game.add_player('Sue')
-    
-    while True:
-        game.player_turn(randrange(5) + 1)
-        
-        if randrange(9) == 7:
-            game.wrong_answer()
-        else:
-            game.was_correctly_answered()
-        if not not_a_winner: break
-    
+    game.add_players(['Chet', 'Pat', 'Sue'])
+    game.start()
