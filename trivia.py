@@ -6,6 +6,7 @@ CONSTANT = {
     'NUMBER_OF_QUESTIONS': 50,
     'LIST_OF_CATEGORIES': ['Pop', 'Science', 'Sports', 'Rock'],
     'MIN_NUMBER_OF_PLAYERS': 2,
+    'POINT_FOR_WINNING': 6,
 }
 
 log_game = {
@@ -20,6 +21,8 @@ log_game = {
     'not_leave_penalty_box': '$player_name is not getting out of the penalty box',
     'question_category': 'The category is $question_category',
     'wrong_answer': 'Question was incorrectly answered',
+    'correct_answer': 'Answer was correct!!!!',
+    'player_score': '$player_name now has $player_score Gold Coins.',
 }
 
 dict_places_category = {
@@ -122,33 +125,10 @@ class Game:
         return Utils.multi_key_dict_get(dict_places_category, self.get_current_player().place)
 
     def was_correctly_answered(self):
-        if self.in_penalty_box[self.current_player]:
-            if self.is_getting_out_of_penalty_box:
-                print('Answer was correct!!!!')
-                self.purses[self.current_player] += 1
-                print(self.players[self.current_player] + \
-                    ' now has ' + \
-                    str(self.purses[self.current_player]) + \
-                    ' Gold Coins.')
-
-                winner = self._did_player_win()
-                self.current_player += 1
-                if self.current_player == self.players._last_index(): self.current_player = 0
-                return winner
-
-            self.current_player += 1
-            if self.current_player == self.players._last_index(): self.current_player = 0
-            return True
-        print("Answer was corrent!!!!")
-        self.purses[self.current_player] += 1
-        print(self.players[self.current_player] + \
-            ' now has ' + \
-            str(self.purses[self.current_player]) + \
-            ' Gold Coins.')
-
-        winner = self._did_player_win()
-
-        return winner
+        self.get_current_player().score += 1
+        Utils.print_log_game('correct_answer')
+        Utils.print_log_game('player_score', player_name=self._get_current_player_name(), player_score=self.get_current_player().score)
+ 
 
     def wrong_answer(self):
         Utils.print_log_game('wrong_answer')
@@ -160,7 +140,7 @@ class Game:
         if self.current_player > self.players._last_index(): self.current_player = 0
 
     def _did_player_win(self):
-        return not (self.purses[self.current_player] == 6)
+        return self.get_current_player().score >= CONSTANT['POINT_FOR_WINNING']
 
 class Question:
     def __init__(self, question):
@@ -180,7 +160,7 @@ class Questions:
 class Player:
     def __init__(self, name):
         self.name = name
-        self.purse = 0
+        self.score = 0
         self.place = 0
         self.is_in_penalty_box = False
 
@@ -210,15 +190,13 @@ if __name__ == '__main__':
     game.add_player('Chet')
     game.add_player('Pat')
     game.add_player('Sue')
-    counter = 0
+    
     while True:
         game.player_turn(randrange(5) + 1)
         
         if randrange(9) == 7:
-            # not_a_winner = game.wrong_answer()
-            not_a_winner = False
+            game.wrong_answer()
         else:
-            # not_a_winner = game.was_correctly_answered()
-            not_a_winner = True
+            game.was_correctly_answered()
         if not not_a_winner: break
     
