@@ -3,11 +3,12 @@ from random import randint
 from string import Template
 
 CONSTANT = {
-    'NUMBER_OF_QUESTIONS': 50,
+    'NUMBER_OF_QUESTIONS_BY_CATEGORY': 50,
     'LIST_OF_CATEGORIES': ['Pop', 'Science', 'Sports', 'Rock'],
     'MIN_NUMBER_OF_PLAYERS': 2,
     'POINT_FOR_WINNING': 6,
     'DICE_FACE': 6,
+    'NUMBER_OF_PLACES': 12,
 }
 
 log_game = {
@@ -24,6 +25,7 @@ log_game = {
     'wrong_answer': 'Question was incorrectly answered',
     'correct_answer': 'Answer was correct!!!!',
     'player_score': '$player_name now has $player_score Gold Coins.',
+    'winner': '$player_name won the game with $player_score Gold Coins!',
 }
 
 dict_places_category = {
@@ -67,23 +69,26 @@ class Game:
             self.list_all_questions[category] = Questions(category)
 
     def _generate_questions_by_category(self):
-        for list_questions in self.list_all_questions.values():
-            self._generate_questions(list_questions)
+        [self._generate_questions(category) for category in self.list_all_questions.values()]
 
     def _generate_questions(self, category):
-        for _ in range(CONSTANT['NUMBER_OF_QUESTIONS']):
-            category.add_question(Question(\
-                Utils.template_log('add_question',\
-                     question_category=category.category_name,\
-                     question_number=category.questions.__len__())))
+        [category.add_question(Question(\
+            Utils.template_log('add_question',\
+            question_category=category.category_name,\
+            question_number=category.questions.__len__())))\
+            for _ in range(CONSTANT['NUMBER_OF_QUESTIONS_BY_CATEGORY'])]
 
     def _is_playable(self):
         return self.players.__len__() >= CONSTANT['MIN_NUMBER_OF_PLAYERS']
 
     def start(self):
-        while self._is_playable() and not self._is_current_player_winner():
+        while self._is_playable():
             self._player_turn(self._roll_dice())
-        
+            if self._is_current_player_winner():        
+                self._player_win()
+                break
+            self._change_current_player()
+                
 
     def _roll_dice(self):
         return randint(1, CONSTANT['DICE_FACE'])
@@ -110,8 +115,11 @@ class Game:
 
     def _move_player_place(self, roll_dice):
         self._get_current_player().place += roll_dice
-        if self._get_current_player().place > 11:
-            self._get_current_player().place -= 12      
+        if self._get_current_player().place >= CONSTANT['NUMBER_OF_PLACES']:
+            self._get_current_player().place -= CONSTANT['NUMBER_OF_PLACES']
+        self._log_move_player()
+       
+    def _log_move_player(self):
         Utils.print_log_game('new_location', player_name=self._get_current_player_name(),\
             new_location=self._get_current_player().place)
 
@@ -126,8 +134,12 @@ class Game:
             self._move_player_place(roll_dice)
             self._ask_question()
             self._simulate_player_answer()
-        
-        self._change_current_player()
+
+
+    def _player_win(self):
+        if self._is_current_player_winner():
+            Utils.print_log_game('winner', player_name=self._get_current_player_name(),\
+                player_score=self._get_current_player().score)
 
     def _ask_question(self):
         Utils.print_log_game('question_category', question_category=self._current_category())
@@ -150,9 +162,9 @@ class Game:
  
 
     def _wrong_answer(self):
+        self._get_current_player().is_in_penalty_box = True
         Utils.print_log_game('wrong_answer')
         Utils.print_log_game('sent_to_penalty_box', player_name=self._get_current_player_name())
-        self._get_current_player().is_in_penalty_box = True
 
     def _change_current_player(self):
         self.current_player += 1
