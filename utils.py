@@ -12,7 +12,6 @@ class Utils:
     def template_log(log_type, **kwargs):
         return Template(log_game[log_type]).substitute(kwargs)
 
-
     @staticmethod
     def print_log_game(log_key, **kwargs):
         print(Utils.template_log(log_key, **kwargs))
