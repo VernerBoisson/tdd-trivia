@@ -109,7 +109,8 @@ class Game:
     def _correct_answer(self):
         self._get_current_player().score += 1
         Utils.print_log_game('correct_answer')
-        Utils.print_log_game('player_score', player_name=self._get_current_player_name(), player_score=self._get_current_player().score)
+        Utils.print_log_game('player_score', player_name=self._get_current_player_name(),\
+            player_score=self._get_current_player().score)
 
     def _wrong_answer(self):
         self._get_current_player().is_in_penalty_box = True
