@@ -2,7 +2,6 @@ import unittest
 from trivia import Game
 from players import Player, Players
 from questions import Question, Questions
-from unittest.mock import patch, call
 
 class TestGame(unittest.TestCase):
     def test_game_init(self):
@@ -10,7 +9,6 @@ class TestGame(unittest.TestCase):
         self.assertIsInstance(game.players, Players)
         self.assertEqual(game.current_player_index, 0)
         self.assertIsInstance(game.list_all_questions, dict)
-        self.assertEqual(game.list_all_questions, {})
 
     def test_init_list_all_questions(self):
         game = Game()
@@ -25,12 +23,6 @@ class TestGame(unittest.TestCase):
         game.current_player_index = 1
         self.assertIsInstance(game._get_current_player(), Player)
 
-    def test_get_current_player_name(self):
-        game = Game()
-        game.players.add_players([Player('player1'), Player('player2')])
-        game.current_player_index = 1
-        # TODO: implement
-
     def test_get_question_category(self):
         game = Game()
         game.players.add_players([Player('player1'), Player('player2')])
@@ -38,55 +30,9 @@ class TestGame(unittest.TestCase):
         game.players.players[0].place = 1
         self.assertEqual(game._get_question_category(), 'Science')
 
-    
-    def test_start(self):
-        pass            
-
-    def test_player_turn(self):
-        pass
-
     def test_roll_dice(self):
         game = Game()
         self.assertIn(game._roll_dice(), range(1, 7))
-
-    def test_log_roll_dice(self):
-        pass
-
-    def test_add_players(self):
-        game = Game()
-        game.add_players([Player('player1'), Player('player2')])
-        self.assertEqual(game.players.players, [Player('player1'), Player('player2')])
-
-    def test_leave_penalty_box(self):
-        game = Game()
-        game.players.add_players([Player('player1'), Player('player2')])
-        game.players[0].is_in_penalty_box = True
-        game._leave_penalty_box(2)
-        self.assertEqual(game.players[0].is_in_penalty_box, False)
-        game.players[0].is_in_penalty_box = True
-        game._leave_penalty_box(1)
-        self.assertEqual(game.players[0].is_in_penalty_box, True)
-
-    def test_move_player_place(self):
-        game = Game()
-        game.players.add_players([Player('player1'), Player('player2')])
-        game.players[0].place = 3
-        game._move_player_place(5)
-        self.assertEqual(game.players[0].place, 8)
-        game._move_player_place(5)
-        self.assertEqual(game.players[0].place, 1)
-       
-    def test_log_move_player(self):
-        pass
-
-    def test_log_player_turn(self):
-        pass
-        
-    def test_ask_question(self):
-        pass
-
-    def test_simulate_player_answer(self):
-        pass
 
     def test_correct_answer(self):
         game = Game()
