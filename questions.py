@@ -20,10 +20,15 @@ class Questions:
             for _ in range(number_of_questions)]
 
     def get_last_question(self):
-        return self.questions[-1].question
+        if self.questions.__len__() > 0:
+            return self.questions[self.questions.__len__() - 1]
 
     def drop_last_question(self):
-        return self.questions.pop()
+        if self.questions.__len__() > 0:
+            self.questions.pop()
+    
+    def is_empty(self):
+        return self.questions.__len__() == 0
 
     def __len__(self):
         return len(self.questions)
