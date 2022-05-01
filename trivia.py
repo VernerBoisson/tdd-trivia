@@ -8,17 +8,17 @@ import config_game as ConfigGame
 class Game:
     def __init__(self):
         self.players = Players()
-        self.current_player = 0
+        self.current_player_index = 0
         self.list_all_questions = {}
-        self._init_list_categories(ConfigGame.LIST_OF_CATEGORIES)
+        self._init_list_all_questions(ConfigGame.LIST_OF_CATEGORIES)
 
-    def _init_list_categories(self, list_of_categories):
+    def _init_list_all_questions(self, list_of_categories):
         for category in list_of_categories:
             self.list_all_questions[category] = Questions(category)
             self.list_all_questions[category].generate_questions(ConfigGame.NUMBER_OF_QUESTIONS_BY_CATEGORY)
 
     def _get_current_player(self):
-        return self.players.get_player_by_index(self.current_player)
+        return self.players.get_player_by_index(self.current_player_index)
 
     def _get_current_player_name(self):
         return self._get_current_player().name
@@ -42,8 +42,10 @@ class Game:
     def _player_turn(self):
         roll_dice = self._roll_dice()
         self._log_roll_dice(roll_dice)
-        self._player_try_to_leave_penalty_box(roll_dice)
-        self._player_move(roll_dice)
+        self._leave_penalty_box(roll_dice)
+        if not self._get_current_player().is_in_penalty_box:
+            self._move_player_place(roll_dice)
+            self._ask_question()
 
     def _roll_dice(self):
         return randint(1, ConfigGame.DICE_FACE)
@@ -56,7 +58,7 @@ class Game:
 
     def _leave_penalty_box(self, roll_dice):
         current_player = self._get_current_player()
-        if Utils.is_even(roll_dice):
+        if self._get_current_player().is_in_penalty_box and Utils.is_even(roll_dice):
             Utils.print_log_game('not_leave_penalty_box', player_name=current_player.name)
             return
         Utils.print_log_game('leave_penalty_box', player_name=current_player.name)
@@ -74,16 +76,7 @@ class Game:
 
     def _log_player_turn(self):
         Utils.print_log_game('player_turn', player_name=self._get_current_player_name())
-
-    def _player_try_to_leave_penalty_box(self, roll_dice):
-        if self._get_current_player().is_in_penalty_box:
-            self._leave_penalty_box(roll_dice)
     
-    def _player_move(self, roll_dice):
-        if not self._get_current_player().is_in_penalty_box:
-            self._move_player_place(roll_dice)
-            self._ask_question()
-
     def _player_win(self):
         if self._is_current_player_winner():
             Utils.print_log_game('winner', player_name=self._get_current_player_name(),\
@@ -119,8 +112,8 @@ class Game:
         Utils.print_log_game('sent_to_penalty_box', player_name=self._get_current_player_name())
 
     def _change_current_player(self):
-        self.current_player += 1
-        if self.current_player > self.players.last_index(): self.current_player = 0
+        self.current_player_index += 1
+        if self.current_player_index > self.players.last_index(): self.current_player_index = 0
 
     def _is_current_player_winner(self):
         return self._get_current_player().score >= ConfigGame.POINT_FOR_WINNING
