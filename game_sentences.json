@@ -15,5 +15,6 @@
     "winner": "$player_name won the game with $player_score Gold Coins!",
     "no_question_category": "$question_category is empty",
     "question": "The question is: $question",
-    "no_more_questions": "There are no more questions, the game is over!"
+    "no_more_questions": "There are no more questions, the game is over!",
+    "test": "This is a test"
 }
